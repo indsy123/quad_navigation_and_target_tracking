@@ -1,0 +1,48 @@
+#planner paramters
+run_number: "2"
+mode: hardware # use "simulation" or "hardware"
+px4_controller_type: attitude # or attitude
+odometry_topic: /udrone1/mavros/odometry/in #/udrone1/final_odometry
+odometry_frequency: 30.0
+
+pointcloud_topic: /voxel_grid/output 
+pointcloud_frequency: 15.0
+cmd_topic: udrone1/mavros/setpoint_raw/attitude
+posecmd_topic: udrone1/mavros/setpoint_raw/local
+target_topic: /udrone1/target_position
+count_topic: /udrone1/neutron_counts
+battery_topic: /udrone1/mavros/battery
+maxTrajectoryLength: 4.0 # same as maximum sensor range
+minTrajectoryLength: 1.0
+fov_x: 60.0
+fov_y: 60.0
+mass: 1.95
+max_thrust: 27.7 # 27.5 for 3s battery 37 for 4s(check)
+battery_percentage: 100.0
+max_velocity: 1.25
+max_angularvelocity: 35.0
+hovering_height: 1.0
+initial_position: [0.0, 0.0, 0.12]
+final_goal: [20.0, 0.0, 1.0]
+#controller parameters
+kx: [4.5, 4.5, 4.5]
+kv: [2.2, 2.2, 2.2]
+# will be used only with hardware
+tau_rp: 0.275 
+tau_yaw: 0.475
+# will be used only with simulation
+kR: [2.0, 2.0, 0.8]
+kOmega: [0.52, 0.52, 0.18]
+
+#pointcloud transformation paramters for d435
+cogTbase: [1.0, 0.0, 0.0, 0.12, 0.0, 1.0, 0.0, 0.02, 0.0, 0.0, 1.0, 0.01, 0.0, 0.0, 0.0, 1.0] # camera base in drone cog frame
+#cogTbase: [0.9914449, 0.0, 0.1305262, 0.12, 0.0, 1.0, 0.0, 0.02, -0.1305262, 0.0, 0.9914449, 0.01, 0.0, 0.0, 0.0, 1.0] # 10 deg pitch
+baseTcoc: [0.0, 0.0, 1.0, 0.0, -1.0, 0.0, 0.0, 0.015, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0] # camera optical center in camera base
+
+#detection parameters
+source_strength_cps: 5.0 #5000.0
+#16852.0
+background_cps: 0.15 #0.005
+sensor_cross_section: 0.2 #2.77e-4
+alpha: 0.1
+counts_frequency: 1.0

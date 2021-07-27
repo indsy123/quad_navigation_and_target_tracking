@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+
+  <param name="input_odometry_topic" value="/udrone1/ov_msckf/odomimu"/>
+  <param name="input_odometry_frequency" value="30.0"/>
+  <param name="input_imu_topic" value="/udrone1/t265/imu"/>
+  <param name="input_imu_frequency" value="62.0"/>
+  <param name="output_odometry_topic" value="/udrone1/final_odometry" />
+  <param name="output_mavros_topic" value="/udrone1/mavros/vision_pose/pose"/>
+
+
+  <rosparam param="pGinM">[0.12, 0.03, 0.1]</rosparam>
+  <rosparam param="vGinM">[0.0, 0.0, 0.0]</rosparam>
+  <rosparam param="pCoGinI">[-0.03, 0.0, -0.12]</rosparam>
+  <rosparam param="RMtoG">[0, -1, 0, 1, 0, 0, 0, 0, 1]</rosparam>
+  <!-- for 13 degree /-->
+  <rosparam param="RItoCoG">[0, 1, 0, 0.23344, 0, 0.97237, 0.97237, 0 , -0.23344]</rosparam> 
+
+  <node pkg="quad_navigation_and_target_tracking" name="transformVIO" type="vio2cog_propagte_and_transform_node" respawn="true" output="screen"/>
+   
+
+</launch>

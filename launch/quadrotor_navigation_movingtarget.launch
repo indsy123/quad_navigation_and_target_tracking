@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="moving_target" default="true"/>
+  <arg name="record_data" default="false"/>
+  
+    <group if="$(arg moving_target)">
+      <rosparam file="$(find quad_navigation_and_target_tracking)/launch/params.yaml" command="load" />  
+      <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />    
+      <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+	<remap from="~input" to="/udrone1/d435/depth_registered/points" />
+	<rosparam>
+          filter_field_name: z
+          filter_limit_min: 0.5
+          filter_limit_max: 4.0
+          filter_limit_negative: False
+          leaf_size: 0.125
+        </rosparam>
+      </node>
+
+      <node pkg="quad_navigation_and_target_tracking" name="TrajectoryGeneration" type="rhp_movingtarget_node" respawn="true" output="screen"/>
+
+      <!--node pkg="octomap_server" type="octomap_server_node" name="octomap_server1">
+	<param name="resolution" value="0.2" />		
+	<param name="frame_id" type="string" value="world" />		
+	<param name="sensor_model/max_range" value="4.0" />
+	<param name="publish_free_space" value="true"/>
+	<remap from="cloud_in" to="/voxel_grid/output" />
+      </node-->
+
+      <node pkg="quad_navigation_and_target_tracking" type="ssd_detection_jackal.py" name="detction_using_ssd_mobilenet" respawn="true" output="screen"/>
+      <node pkg="quad_navigation_and_target_tracking" type="ssd_kalman_filter.py" name="ssd_kalman_filter" respawn="true" output="screen"/>
+
+      <node pkg="rosbag" type="record" name="record_dataset" args="record -o /home/pelican/data_collection/rosbags/ /tf /tf_static /udrone1/mavros/local_position/pose /udrone1/mavros/vision_pose/pose /udrone1/final_odometry /udrone1/mavros/odometry/in /udrone1/d435/color/image_raw /udrone1/d435/aligned_depth_to_color/image_raw /udrone1/best_trajectory /udrone1/selected_trajectory /udrone1/ensemble /voxel_grid/output"/>
+    </group>
+
+    <group unless="$(arg moving_target)">
+      <rosparam file="$(find quad_navigation_and_target_tracking)/launch/params.yaml" command="load" />
+      <node pkg="quad_navigation_and_target_tracking" name="TrajectoryGeneration" type="planner_noRHP_node" respawn="false" output="screen"/>
+    </group>
+
+</launch>

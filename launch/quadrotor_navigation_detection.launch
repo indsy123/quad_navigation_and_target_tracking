@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="moving_target" default="false"/>
+  <arg name="record_data" default="false"/>
+  <arg name="run_number" default="0"/> 
+  
+    <group if="$(arg moving_target)">
+      <rosparam file="$(find quad_navigation_and_target_tracking)/launch/params.yaml" command="load" />  
+      <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen" />    
+      <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+	<remap from="~input" to="/udrone1/d435/depth_registered/points" />
+	<rosparam>
+          filter_field_name: z
+          filter_limit_min: 0.5
+          filter_limit_max: 4.0
+          filter_limit_negative: False
+          leaf_size: 0.125
+        </rosparam>
+      </node>
+
+      <node pkg="quad_navigation_and_target_tracking" name="TrajectoryGeneration" type="rhp_movingtarget_node" respawn="true" output="screen"/>
+
+      <!--node pkg="quad_navigation_and_target_tracking" type="ssd_detection_kalman_filter.py" name="detction_using_ssd_mobilenet" respawn="true" output="screen"/-->
+
+      <node pkg="quad_navigation_and_target_tracking" type="ssd_detection_jackal.py" name="detction_using_ssd_mobilenet" respawn="true" output="screen"/>
+      <node pkg="quad_navigation_and_target_tracking" type="ssd_kalman_filter.py" name="ssd_kalman_filter" respawn="true" output="screen"/>
+      
+      <node pkg="quad_navigation_and_target_tracking" type="detection_calculations_gamma.py" name="detection_calculations_gamma" respawn="true" output="screen"/>
+      <node pkg="quad_navigation_and_target_tracking" type="gm10_ros_node.py" name="gm10_ros_node" respawn="true" output="screen"/>
+
+      <node pkg="rosbag" type="record" name="record_dataset" args="record -o /home/pelican/data_collection/rosbags/ /tf /tf_static /udrone1/final_odometry /udrone1/mavros/odometry/in /udrone1/d435/color/image_raw /udrone1/d435/aligned_depth_to_color/image_raw /udrone1/best_trajectory /udrone1/selected_trajectory /udrone1/ensemble /voxel_grid/output /udrone1/neutron_counts /udrone1/target_position"/>
+    </group>
+
+    <group unless="$(arg moving_target)">
+      <rosparam file="$(find quad_navigation_and_target_tracking)/launch/params.yaml" command="load" />
+      <node pkg="quad_navigation_and_target_tracking" name="TrajectoryGeneration" type="planner_noRHP_node" respawn="false" output="screen"/>
+    </group>
+
+</launch>

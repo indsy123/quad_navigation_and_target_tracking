@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+     
+      <arg name="bag" default="/home/pelican/data_collection/rosbags/osc_good.bag" />
+      <node pkg="rosbag" type="play" name="rosbag" args="-d 1 $(arg bag)" required="true"/>
+
+      <node pkg="quad_navigation_and_target_tracking" type="ssd_detection_kalman_filter.py" name="detction_using_ssd_mobilenet" respawn="true" output="screen"/>
+     
+      <!--node pkg="quad_navigation_and_target_tracking" type="ssd_detection_jackal.py" name="detction_using_ssd_mobilenet" respawn="true" output="screen"/>
+      <node pkg="quad_navigation_and_target_tracking" type="ssd_kalman_filter.py" name="ssd_kalman_filter" respawn="true" output="screen"/-->
+      
+      
+
+</launch>
